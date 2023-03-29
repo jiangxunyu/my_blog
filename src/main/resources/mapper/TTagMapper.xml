@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxy.my_blog.mapper.TTagMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jxy.my_blog.entity.TTag">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <collection property="blogs" javaType="com.jxy.my_blog.entity.TBlog">
+            <id column="blog_id" property="id" />
+            <result column="title" property="title" />
+            <result column="content" property="content" />
+            <result column="first_picture" property="firstPicture" />
+            <result column="flag" property="flag" />
+            <result column="views" property="views" />
+            <result column="appreciation" property="appreciation" />
+            <result column="share_statement" property="shareStatement" />
+            <result column="commentabled" property="commentabled" />
+            <result column="published" property="published" />
+            <result column="recommend" property="recommend" />
+            <result column="create_time" property="createTime" />
+            <result column="update_time" property="updateTime" />
+            <result column="tagIds" property="tagIds" />
+            <result column="description" property="description" />
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name
+    </sql>
+
+    <sql id="blog_column_list">
+        t3.id blog_id,
+        t3.title,
+        t3.content,
+        t3.first_picture,
+        t3.flag,
+        t3.views,
+        t3.appreciation,
+        t3.share_statement,
+        t3.commentabled,
+        t3.published,
+        t3.recommend,
+        t3.create_time,
+        t3.update_time,
+        t3.tagIds,
+        t3.description,
+        t3.user_id,
+        t3.type_id
+    </sql>
+
+    <select id="listTage" resultType="com.jxy.my_blog.entity.TTag">
+        select <include refid="Base_Column_List"/> from t_tag
+    </select>
+
+    <select id="listAllTag" resultMap="BaseResultMap">
+        select t1.id,t1.name,<include refid="blog_column_list"/> from t_tag t1
+        left join t_blog_tag t2 on t1.id = t2.tag_id
+        left join t_blog t3 on t2.blog_id = t3.id
+    </select>
+
+    <select id="listByIds" resultMap="BaseResultMap">
+        select t1.id,t1.name,<include refid="blog_column_list"/> from t_tag t1
+        left join t_blog_tag t2 on t1.id = t2.tag_id
+        left join t_blog t3 on t2.blog_id = t3.id
+        where t1.id in (
+            <foreach collection="ids" index="index" item="item" separator=",">
+                #{item}
+            </foreach>
+        )
+    </select>
+
+    <select id="getTagById" resultMap="BaseResultMap">
+        select t1.id,t1.name,<include refid="blog_column_list"/> from t_tag t1
+        left join t_blog_tag t2 on t1.id = t2.tag_id
+        left join t_blog t3 on t2.blog_id = t3.id
+        where t1.id = #{id}
+    </select>
+
+    <select id="getTagByName" resultMap="BaseResultMap">
+        select t1.id,t1.name,<include refid="blog_column_list"/> from t_tag t1
+        left join t_blog_tag t2 on t1.id = t2.tag_id
+        left join t_blog t3 on t2.blog_id = t3.id
+        where t1.name = #{name} limit 1
+    </select>
+
+    <select id="getTags" resultType="com.jxy.my_blog.entity.TTag">
+        select t1.id,t1.name from t_tag t1
+    </select>
+
+</mapper>

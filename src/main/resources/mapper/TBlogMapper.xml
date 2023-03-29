@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxy.my_blog.mapper.TBlogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jxy.my_blog.entity.TBlog">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="first_picture" property="firstPicture" />
+        <result column="flag" property="flag" />
+        <result column="views" property="views" />
+        <result column="appreciation" property="appreciation" />
+        <result column="share_statement" property="shareStatement" />
+        <result column="commentabled" property="commentabled" />
+        <result column="published" property="published" />
+        <result column="recommend" property="recommend" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="tagIds" property="tagIds" />
+        <result column="description" property="description" />
+        <association property="user" javaType="com.jxy.my_blog.entity.TUser">
+            <result column="user_id" property="id"/>
+            <result column="nickname" property="nickname" />
+            <result column="username" property="username" />
+            <result column="password" property="password" />
+            <result column="email" property="email" />
+            <result column="avatar" property="avatar" />
+            <result column="type" property="type" />
+            <result column="create_time1" property="createTime" />
+            <result column="update_time1" property="updateTime" />
+        </association>
+        <association property="type" javaType="com.jxy.my_blog.entity.TType">
+            <result column="type_id" property="id"/>
+            <result column="type_name" property="name" />
+        </association>
+        <collection property="tags" javaType="com.jxy.my_blog.entity.TTag">
+            <id column="tag_id" property="id" />
+            <result column="tag_name" property="name" />
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        t1.id,
+        t1.title,
+        t1.content,
+        t1.first_picture,
+        t1.flag,
+        t1.views,
+        t1.appreciation,
+        t1.share_statement,
+        t1.commentabled,
+        t1.published,
+        t1.recommend,
+        t1.create_time,
+        t1.update_time,
+        t1.tagIds,
+        t1.description,
+        t1.user_id,
+        t1.type_id
+    </sql>
+
+    <sql id="other_column">
+        t2.nickname,
+        t2.username,
+        t2.password,
+        t2.email,
+        t2.avatar,
+        t2.type,
+        t2.create_time create_time1,
+        t2.update_time update_time1,
+        t3.name type_name
+    </sql>
+
+    <sql id="other_column1">
+        t5.id tag_id,
+        t5.name tag_name
+    </sql>
+
+    <update id="updateViews">
+        update t_blog b set b.views = b.views+1 where b.id = #{id}
+    </update>
+
+    <select id="listBlog" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>,<include refid="other_column"/>
+        from t_blog t1
+        left join t_user t2 on t1.user_id = t2.id
+        left join t_type t3 on t1.type_id = t3.id
+        where t1.published = 1
+        order by t1.update_time desc
+    </select>
+
+    <select id="listBlogWithQuery" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>,<include refid="other_column"/>
+        from t_blog t1
+        left join t_user t2 on t1.user_id = t2.id
+        left join t_type t3 on t1.type_id = t3.id
+        where t1.title like concat('%',trim(#{query}),'%')
+        and t1.published = 1
+        order by t1.update_time desc
+    </select>
+
+    <select id="listBlogWithType" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>,<include refid="other_column"/>,<include refid="other_column1"/>
+        from t_blog t1
+        left join t_user t2 on t1.user_id = t2.id
+        left join t_type t3 on t1.type_id = t3.id
+        left join t_blog_tag t4 on t1.id = t4.blog_id
+        left join t_tag t5 on t4.tag_id = t5.id
+        where t1.type_id = #{typeId}
+        and t1.published = 1
+        order by t1.update_time desc
+    </select>
+
+    <select id="listBlogWithTag" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>,<include refid="other_column"/>,<include refid="other_column1"/>
+        from t_blog t1
+        left join t_user t2 on t1.user_id = t2.id
+        inner join t_type t3 on t1.type_id = t3.id
+        left join t_blog_tag t4 on t1.id = t4.blog_id
+        left join t_tag t5 on t4.tag_id = t5.id
+        where t3.id = #{tagId}
+        and t1.published = 1
+        order by t1.update_time desc
+    </select>
+
+    <select id="listAllBlog" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>,<include refid="other_column"/>
+        from t_blog t1
+        left join t_user t2 on t1.user_id = t2.id
+        left join t_type t3 on t1.type_id = t3.id
+        where t1.published = 1
+        order by t1.update_time desc
+    </select>
+
+    <select id="getBlog" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>,<include refid="other_column"/>
+        from t_blog t1
+        left join t_user t2 on t1.user_id = t2.id
+        left join t_type t3 on t1.type_id = t3.id
+        where t1.id = #{id}
+    </select>
+
+    <select id="queryBlog" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>,<include refid="other_column"/>
+        from t_blog t1
+        left join t_user t2 on t1.user_id = t2.id
+        left join t_type t3 on t1.type_id = t3.id
+        where 1 = 1
+        <if test="query.title != null and query.title != ''">
+            and t1.title like concat('%',trim(#{query.title}),'%')
+        </if>
+        <if test="query.typeId != null">
+            and t1.type_id = #{query.typeId}
+        </if>
+        <if test="query.recommend != null">
+            and t1.recommend = #{query.recommend}
+        </if>
+        order by t1.update_time desc
+    </select>
+
+</mapper>

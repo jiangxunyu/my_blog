@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxy.my_blog.mapper.TBlogTagDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jxy.my_blog.entity.TBlogTag">
+        <id column="id" property="id" />
+        <result column="blog_id" property="blogId" />
+        <result column="tag_id" property="tagId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        blog_id, tag_id, id
+    </sql>
+
+    <delete id="deleteByBlogId">
+        delete from t_blog_tag where blog_id = #{blogId}
+    </delete>
+
+</mapper>

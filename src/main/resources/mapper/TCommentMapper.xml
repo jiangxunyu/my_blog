@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxy.my_blog.mapper.TCommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jxy.my_blog.entity.TComment">
+        <id column="id" property="id" />
+        <result column="nickname" property="nickname" />
+        <result column="email" property="email" />
+        <result column="content" property="content" />
+        <result column="avatar" property="avatar" />
+        <result column="create_time" property="createTime" />
+        <result column="admin_comment" property="adminComment" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        t1.id,
+        t1.nickname,
+        t1.email,
+        t1.content,
+        t1.avatar,
+        t1.create_time,
+        t1.admin_comment
+    </sql>
+
+    <insert id="addComment">
+        insert into t_comment(id,nickname,email,content,avatar,create_time,admin_comment) values(#{id},#{nickname}
+        ,#{email},#{content},#{avatar},#{createTime},#{adminComment})
+    </insert>
+
+    <select id="getTopCommentByBlogId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from t_comment t1
+        inner join t_blog_comment t2 on t1.id = t2.comment_id
+        inner join t_parent_comment t3 on t2.comment_id = t3.comment_id
+        where t3.parent_id = 0
+        and t2.blog_id = #{blogId}
+    </select>
+
+    <select id="getAllChildren" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from t_comment t1
+        inner join t_parent_comment t2 on t1.id = t2.comment_id
+        where t2.parent_id = #{parentId}
+    </select>
+
+    <select id="getParent" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from t_comment t1
+        inner join t_parent_comment t2 on t1.id = t2.parent_id
+        where t2.comment_id = #{id}
+    </select>
+
+</mapper>
